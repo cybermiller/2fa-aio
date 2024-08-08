@@ -88,12 +88,50 @@
             color: #0233e6;
             font-weight: 300;
             font-size: xx-large;
+            position: relative;
         }
-
         #app_label {
             font-weight: 500;
             color: #343a40;
-            font-size: 90%;
+        }
+        #copy_secret{
+            background: #ffffff;
+            cursor: pointer;
+            position: relative;
+        }
+        #copy_secret:hover{
+            color: #fff;
+            background-color: #a8b5c1;
+            border-color: #a8b5c1;
+        }
+        #app_code:before,
+        #copy_secret:before {
+            content: "Copied";
+            position: absolute;
+            top: -35px;
+            right: 0;
+            background: #333;
+            color: #fff;
+            padding: 4px 13px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+        }
+        #copy_secret:after {
+            content: "";
+            position: absolute;
+            top: -15px;
+            right: 25px;
+            width: 10px;
+            height: 10px;
+            background: #333;
+            transform: rotate(45deg);
+            display: none;
+        }
+        #app_code.active:before,
+        #copy_secret.active:before,
+        #copy_secret.active:after{
+            display: block;
         }
     </style>
 </head>
@@ -177,122 +215,46 @@
     
     <div class="modal-backdrop show d-none" id="modal_backdrop"></div>
     
-    <hr>
-    <p><input class="form-control" type="search" id="secret" placeholder="Secret &mdash; Required" autocomplete="off"
-              spellcheck="false"></p>
+    <div class="input-group mb-3">
+        <input class="form-control" type="search" id="secret" placeholder="Secret &mdash; Required" autocomplete="off"
+               spellcheck="false">
+        <div class="input-group-append">
+            <span class="input-group-text" id="copy_secret">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"></path>
+                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"></path>
+                </svg>
+            </span>
+        </div>
+    </div>
+   
     <p><input class="form-control" type="search" id="label" placeholder="Label" autocomplete="off"
               spellcheck="false"></p>
-    <p>
-        <select class="form-control" id="type" autocomplete="off">
-            <option value="totp">Time based (TOTP)</option>
-            <option value="hotp">Counter based (HOTP)</option>
-        </select>
-    </p>
     <p><input class="form-control" type="search" id="issuer" placeholder="Issuer &mdash; Optional" list="issuers"
               spellcheck="false"></p>
     <p><input class="form-control d-none" type="search" id="counter" placeholder="Initial counter &mdash; Defaults to 0"
               pattern="\d+" autocomplete="off" spellcheck="false"></p>
-    
-    <div class="custom-control custom-checkbox">
-        <p><input class="custom-control-input" type="checkbox" id="advanced_options" autocomplete="off"><label
-            class="custom-control-label" for="advanced_options">Advanced options</label></p>
-    </div>
-    
-    <div class="d-none" id="advanced_options_container">
-        <p>Please note that the advanced options are not supported by the Google Authenticator app (all advanced options
-            are ignored). Yubico Authenticator supports these advanced options.</p>
-        <p>
-            <select class="form-control" id="algorithm" autocomplete="off">
-                <option value="SHA1">SHA1 algorithm (Default)</option>
-                <option value="SHA256">SHA256 algorithm</option>
-                <option value="SHA512">SHA512 algorithm</option>
-            </select>
-        </p>
-        <p>
-            <select class="form-control" id="digits" autocomplete="off">
-                <option value="6">6 digits (Default)</option>
-                <option value="8">8 digits</option>
-            </select>
-        </p>
-        <p><input class="form-control" type="search" id="period"
-                  placeholder="Valid period, in seconds &mdash; Defaults to 30" pattern="\d+" autocomplete="off"
-                  spellcheck="false"></p>
-    </div>
-    
-    <hr>
     <p><input class="form-control" type="text" id="uri" placeholder="otpauth://" autocomplete="off" spellcheck="false">
     </p>
-    
-    <datalist id="issuers">
-        <option>Amazon</option>
-        <option>Apple</option>
-        <option>AWS</option>
-        <option>Blizzard</option>
-        <option>Cloudflare</option>
-        <option>Coinbase</option>
-        <option>DigitalOcean</option>
-        <option>Discord</option>
-        <option>Docker</option>
-        <option>DreamHost</option>
-        <option>Dropbox</option>
-        <option>EA</option>
-        <option>eBay</option>
-        <option>Epic Games</option>
-        <option>EVE Online</option>
-        <option>Evernote</option>
-        <option>Facebook</option>
-        <option>Fastly</option>
-        <option>Firefox</option>
-        <option>GitHub</option>
-        <option>GitLab</option>
-        <option>GoDaddy</option>
-        <option>Google</option>
-        <option>Heroku</option>
-        <option>Humble Bundle</option>
-        <option>LastPass</option>
-        <option>MailChimp</option>
-        <option>Mailgun</option>
-        <option>MaxCDN</option>
-        <option>Microsoft</option>
-        <option>Namecheap</option>
-        <option>Newegg</option>
-        <option>npm</option>
-        <option>Okta</option>
-        <option>Private Internet Access</option>
-        <option>ProtonMail</option>
-        <option>Reddit</option>
-        <option>Ring</option>
-        <option>Salesforce</option>
-        <option>SendGrid</option>
-        <option>Slack</option>
-        <option>SparkPost</option>
-        <option>Threat Stack</option>
-        <option>Ting</option>
-        <option>Twitch</option>
-        <option>Ubisoft</option>
-        <option>Ubuntu</option>
-        <option>Yahoo!</option>
-    </datalist>
-    
-    <h5>2FA on Google Authenticator</h5>
     <hr>
-    <div id="app">
-        <div id="app_label"></div>
-        <div id="app_code"></div>
+    <div class="row">
+        <div class="col-md-4">
+            <h5>2FA Code </h5>
+            <div id="app">
+                <div id="app_label"></div>
+                <div id="app_code" title="Click to copy"></div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h5>2FA QR Code <i class="fa fa-clone"></i></h5>
+            <input class="form-control-range" type="range" id="size" value="200" min="50" max="550" step="25"
+                   title="QR Code Size" autocomplete="off">
+    
+            <div class="p-4 text-center" id="qr">
+                <canvas></canvas>
+            </div>
+        </div>
     </div>
-    
-    <h5>2FA QR Code</h5>
-    <hr>
-    <input class="form-control-range" type="range" id="size" value="200" min="50" max="650" step="25"
-           title="QR Code Size" autocomplete="off">
-    
-    <div class="p-4 text-center" id="qr">
-        <canvas></canvas>
-    </div>
-    
-    
-    
-    
 </div>
 
 <script>
@@ -305,21 +267,14 @@
     document.querySelector("link[rel=icon]").href = el.getAttribute("src");
 
     const container = document.getElementById("container");
-    const type = document.getElementById("type");
     const secret = document.getElementById("secret");
     const label = document.getElementById("label");
     const issuer = document.getElementById("issuer");
-    const counter = document.getElementById("counter");
-    const advanced_options = document.getElementById("advanced_options");
-    const advanced_options_container = document.getElementById("advanced_options_container");
-    const algorithm = document.getElementById("algorithm");
-    const digits = document.getElementById("digits");
-    const period = document.getElementById("period");
     const uri = document.getElementById("uri");
     const qr = document.getElementById("qr");
     const app_label = document.getElementById("app_label");
     const app_code = document.getElementById("app_code");
-    
+    const copy_secret = document.getElementById("copy_secret")
     function secret_changed() {
         const secretValue = secret.value.replace(/ /g, '');
         if (secretValue !== '') {
@@ -330,32 +285,13 @@
             });
         }
     }
-    
-    function type_changed() {
-        counter.classList.toggle("d-none", type.value !== "hotp");
-        period.classList.toggle("d-none", type.value !== "totp");
-    }
-    
-
-    function advanced_options_changed() {
-        advanced_options_container.classList.toggle("d-none", !advanced_options.checked);
-    }
 
     function generate_uri() {
         const secretValue = secret.value.replace(/ /g, '');
-        let s = `otpauth://${type.value}/${encodeURIComponent(label.value)}?secret=${secretValue}`;
+        let s = `otpauth://totp/${encodeURIComponent(label.value)}?secret=${secretValue}`;
         
         if (issuer.value !== "") {
             s += `&issuer=${encodeURIComponent(issuer.value)}`;
-        }
-        if (type.value === "hotp") {
-            s += `&counter=${counter.value || "0"}`;
-        }
-        if (advanced_options.checked) {
-            s += `&algorithm=${algorithm.value}&digits=${digits.value}`;
-            if (type.value === "totp") {
-                s += `&period=${period.value || "30"}`;
-            }
         }
         return s;
     }
@@ -385,7 +321,7 @@
         qr.replaceChild(el, qr.firstElementChild);
 
         if (label.value === "" && issuer.value === "") {
-            app_label.textContent = "Unknown";
+            app_label.textContent = "Issuer";
         } else {
             app_label.textContent = issuer.value === "" ? label.value : `${issuer.value} (${label.value})`;
         }
@@ -498,23 +434,12 @@
         }
 
         // update fields
-        const c = url.searchParams.get("counter") || "";
-
-        type.value = url.pathname.substr(2, 4);
         label.value = decode(url.pathname.substr(7));
         secret.value = url.searchParams.get("secret");
         issuer.value = decode(url.searchParams.get("issuer"));
-        counter.value = c === "0" ? "" : c;
-        advanced_options.checked = url.searchParams.has("algorithm") || url.searchParams.has("digits") || url.searchParams.has("period");
-        algorithm.value = url.searchParams.get("algorithm") || "SHA1";
-        digits.value = url.searchParams.get("digits") || "6";
-        period.value = url.searchParams.get("period") === "30" ? "" : url.searchParams.get("period");
-
         secret.classList.toggle("is-invalid", secret.value === "");
         label.classList.toggle("is-invalid", label.value === "Unknown");
         secret_changed();
-        type_changed();
-        advanced_options_changed();
     }
 
     function resize() {
@@ -524,18 +449,29 @@
             update_qr();
         }
     }
-
-    [
-        type, secret, label, issuer, counter,
-        advanced_options, algorithm, digits, period,
-    ].forEach(el => el.addEventListener("input", update_uri));
-    secret.addEventListener("input", type_changed);
-    type.addEventListener("input", type_changed);
-    advanced_options.addEventListener("input", advanced_options_changed);
+    
+    function copyToClipboard(text, targetElement) {
+        if (text.trim()) {
+            targetElement.classList.add('active');
+            navigator.clipboard.writeText(text);
+            setTimeout(function () {
+                targetElement.classList.remove("active");
+            }, 1500);
+        }
+    }
+    
+    [secret, label, issuer].forEach(el => el.addEventListener("input", update_uri));
     uri.addEventListener("input", parse_uri);
     size.addEventListener("input", update_qr);
     window.addEventListener("resize", resize);
-
+    app_code.addEventListener('click', function(ev) {
+        const text = app_code.innerText;
+        copyToClipboard(text, app_code);
+    });
+    copy_secret.addEventListener('click', function (e) {
+        const text = secret.value;
+        copyToClipboard(text, copy_secret);
+    });
     resize();
     update_uri();
 
@@ -791,7 +727,6 @@
             });
 
             window.addEventListener('paste', e => {
-                console.log('Páte')
                 e.preventDefault();
                 for (const item of e.clipboardData.items) {
                     if (item.kind === 'string') {
@@ -801,9 +736,9 @@
                             const img = new Image();
                             img.addEventListener('load', () => handle_file(img));
                             img.src = text;
-                        // } else if (isValid2FASecretKey(text)){
-                        //     secret.value = text;
-                        //     secret_changed();
+                        } else if (isValid2FASecretKey(text)){
+                            secret.value = text;
+                            secret_changed();
                         }
                         continue;
                     }
