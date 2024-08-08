@@ -1,0 +1,16 @@
+Thumbs.db
+.DS_Store
+*.swp
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+.vscode
+.idea
+/src/config/jsons/
+/.env.prod
