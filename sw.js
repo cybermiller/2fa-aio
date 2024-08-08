@@ -1,12 +1,11 @@
 // Increment this number to trigger offline clients to update their caches:
-// v1
 
 self.addEventListener('install', e => {
   self.skipWaiting();
 
   e.waitUntil(
     caches
-      .open('2fa-qr')
+      .open('2fa-aio')
       .then(c =>
         c.addAll([
           'https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css',
