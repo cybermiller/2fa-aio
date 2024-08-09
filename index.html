@@ -250,18 +250,17 @@
     </p>
     <hr>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-5">
             <h5>2FA Code <small>Click to copy</small></h5>
             <div id="app">
                 <div id="app_label"></div>
                 <div id="app_code" title="Click to copy"></div>
             </div>
         </div>
-        <div class="col-md-8">
-            <h5>2FA QR Code <i class="fa fa-clone"></i></h5>
+        <div class="col-md-7">
+            <h5>2FA QR Code</h5>
             <input class="form-control-range" type="range" id="size" value="200" min="50" max="550" step="25"
                    title="QR Code Size" autocomplete="off">
-    
             <div class="p-4 text-center" id="qr">
                 <canvas></canvas>
             </div>
@@ -288,17 +287,6 @@
     const app_code = document.getElementById("app_code");
     const copy_secret = document.getElementById("copy_secret")
     
-    function secret_changed() {
-        const secretValue = secret.value.replace(/ /g, '');
-        if (secretValue !== '') {
-            get2FACodeFromSecret(secretValue).then(code => {
-                app_code.textContent = code;
-            }).catch(error => {
-                console.error('Error generating 2FA code:', error);
-            });
-        }
-    }
-
     function generate_uri() {
         const secretValue = secret.value.replace(/ /g, '');
         let s = `otpauth://totp/${encodeURIComponent(label.value)}?secret=${secretValue}`;
@@ -309,6 +297,38 @@
         return s;
     }
 
+    function parse_uri() {
+        // validate and parse the uri
+        const url = new URL(uri.value);
+        if (url.protocol === "otpauth:"
+            && url.pathname.startsWith("//totp/")
+            && url.searchParams.has("secret")
+        ) {
+            uri.classList.remove("is-invalid");
+        } else {
+            uri.classList.add("is-invalid");
+            return;
+        }
+
+        const s = generate_uri();
+        if (s === uri.value) {
+            // the uri did not change
+            return;
+        }
+
+        // update fields
+        label.value = decode(url.pathname.substr(7));
+        secret.value = url.searchParams.get("secret");
+        issuer.value = decode(url.searchParams.get("issuer"));
+        secret.classList.toggle("is-invalid", secret.value === "");
+        label.classList.toggle("is-invalid", label.value === "Unknown");
+
+        // update the QR code
+        update_qr();
+
+        secret_changed();
+    }
+
     function update_uri() {
         const s = generate_uri();
         if (s === uri.value) {
@@ -316,11 +336,11 @@
         }
 
         uri.value = s;
-        update_qr();
-
         uri.classList.remove("is-invalid");
         secret.classList.toggle("is-invalid", secret.value === "");
         // label.classList.toggle("is-invalid", label.value === "");
+        
+        update_qr();
         secret_changed();
     }
 
@@ -337,6 +357,17 @@
             app_label.textContent = "Issuer";
         } else {
             app_label.textContent = issuer.value === "" ? label.value : `${issuer.value} (${label.value})`;
+        }
+    }
+
+    function secret_changed() {
+        const secretValue = secret.value.replace(/ /g, '');
+        if (secretValue !== '') {
+            get2FACodeFromSecret(secretValue).then(code => {
+                app_code.textContent = code;
+            }).catch(error => {
+                console.error('Error generating 2FA code:', error);
+            });
         }
     }
 
@@ -424,37 +455,6 @@
         return s ? decodeURIComponent(s) : "";
     }
 
-    function parse_uri() {
-        // update the QR code
-        update_qr();
-
-        // validate and parse the uri
-        const url = new URL(uri.value);
-        if (url.protocol === "otpauth:"
-            && url.pathname.startsWith("//totp/")
-            && url.searchParams.has("secret")
-        ) {
-            uri.classList.remove("is-invalid");
-        } else {
-            uri.classList.add("is-invalid");
-            return;
-        }
-
-        const s = generate_uri();
-        if (s === uri.value) {
-            // the uri did not change
-            return;
-        }
-
-        // update fields
-        label.value = decode(url.pathname.substr(7));
-        secret.value = url.searchParams.get("secret");
-        issuer.value = decode(url.searchParams.get("issuer"));
-        secret.classList.toggle("is-invalid", secret.value === "");
-        label.classList.toggle("is-invalid", label.value === "Unknown");
-        secret_changed();
-    }
-
     function resize() {
         const old_value = size.value;
         size.max = Math.min(650, container.clientWidth - 2 * (24 + 15));
@@ -527,7 +527,7 @@
     for (const btn of document.querySelectorAll('[data-bs-dismiss="modal"]')) {
         btn.addEventListener('click', function () {
             let element = this;
-            while (element === element.parentElement) {
+            while (element = element.parentElement) {
                 if (element.classList.contains('modal')) {
                     close_modal(element);
                     break;
@@ -599,7 +599,6 @@
                         }
                         uri.value = r.rawValue;
                         parse_uri();
-                        update_qr();
                         if (secret.value === '') {
                             continue;
                         }
@@ -635,7 +634,6 @@
                                 }
                                 uri.value = r.rawValue;
                                 parse_uri();
-                                update_qr();
                                 if (secret.value === '') {
                                     continue;
                                 }
