@@ -300,6 +300,7 @@
     function parse_uri() {
         // validate and parse the uri
         const url = new URL(uri.value);
+        
         if (url.protocol === "otpauth:"
             && url.pathname.startsWith("//totp/")
             && url.searchParams.has("secret")
@@ -593,12 +594,17 @@
                     }
 
                     for (r of results) {
-                        if (!r.rawValue.startsWith('otpauth://')) {
-                            console.warn('Unsupported URI', r.rawValue);
+                        const uriValue = r.rawValua;
+                        
+                        if (!uriValue.startsWith('otpauth://')) {
+                            console.warn('Unsupported URI', uriValue);
                             continue;
                         }
-                        uri.value = r.rawValue;
+                        
+                        uri.value = uriValue;
+                        
                         parse_uri();
+                        
                         if (secret.value === '') {
                             continue;
                         }
