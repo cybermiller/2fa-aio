@@ -141,6 +141,11 @@
             background: #333!important;
             color: #fff!important;
         }
+        h5 small{
+            font-size: 70%;
+            color: gray;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -238,8 +243,7 @@
    
     <p><input class="form-control" type="search" id="label" placeholder="Label" autocomplete="off"
               spellcheck="false"></p>
-    <p><input class="form-control" type="search" id="issuer" placeholder="Issuer &mdash; Optional" list="issuers"
-              spellcheck="false"></p>
+    <p><input class="form-control" type="search" id="issuer" placeholder="Issuer &mdash; Optional" spellcheck="false"></p>
     <p><input class="form-control d-none" type="search" id="counter" placeholder="Initial counter &mdash; Defaults to 0"
               pattern="\d+" autocomplete="off" spellcheck="false"></p>
     <p><input class="form-control" type="text" id="uri" placeholder="otpauth://" autocomplete="off" spellcheck="false">
@@ -247,7 +251,7 @@
     <hr>
     <div class="row">
         <div class="col-md-4">
-            <h5>2FA Code </h5>
+            <h5>2FA Code <small>Click to copy</small></h5>
             <div id="app">
                 <div id="app_label"></div>
                 <div id="app_code" title="Click to copy"></div>
@@ -283,6 +287,7 @@
     const app_label = document.getElementById("app_label");
     const app_code = document.getElementById("app_code");
     const copy_secret = document.getElementById("copy_secret")
+    
     function secret_changed() {
         const secretValue = secret.value.replace(/ /g, '');
         if (secretValue !== '') {
@@ -426,7 +431,7 @@
         // validate and parse the uri
         const url = new URL(uri.value);
         if (url.protocol === "otpauth:"
-            && (url.pathname.startsWith("//totp/") || url.pathname.startsWith("//hotp/"))
+            && url.pathname.startsWith("//totp/")
             && url.searchParams.has("secret")
         ) {
             uri.classList.remove("is-invalid");
@@ -522,7 +527,7 @@
     for (const btn of document.querySelectorAll('[data-bs-dismiss="modal"]')) {
         btn.addEventListener('click', function () {
             let element = this;
-            while (element = element.parentElement) {
+            while (element === element.parentElement) {
                 if (element.classList.contains('modal')) {
                     close_modal(element);
                     break;
@@ -598,12 +603,11 @@
                         if (secret.value === '') {
                             continue;
                         }
-                        
                         btn_close_modal.click();
                         return;
                     }
 
-                    qrdetector_status.textContent = 'The QR code data does not start with "otpauth://".';
+                    qrdetector_status.textContent = 'The QR code data does not start with "otpauth://" . ' + uri.value;
                     qrdetector_status.className = 'alert alert-warning';
                 } catch (e) {
                     console.error(e);
