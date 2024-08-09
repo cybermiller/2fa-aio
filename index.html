@@ -342,6 +342,7 @@
         // label.classList.toggle("is-invalid", label.value === "");
         
         update_qr();
+        
         secret_changed();
     }
 
@@ -584,30 +585,26 @@
                     if (file instanceof File) {
                         file = await createImageBitmap(file);
                     }
-
                     const results = await detector.detect(file);
-
+                    console.log('Result:', results)
                     if (results.length === 0) {
                         qrdetector_status.textContent = 'A QR code was not detected in the image.';
                         qrdetector_status.className = 'alert alert-warning';
                         return;
                     }
-
+        
                     for (r of results) {
-                        const uriValue = r.rawValua;
+                        const uriValue = r.rawValue;
+                        
                         if (!uriValue || typeof uriValue !== "string"){
                             continue;
                         }
-                        
                         if (!uriValue.startsWith('otpauth://')) {
                             console.warn('Unsupported URI', uriValue);
                             continue;
                         }
-                        
                         uri.value = uriValue;
-                        
                         parse_uri();
-                        
                         if (secret.value === '') {
                             continue;
                         }
@@ -615,7 +612,7 @@
                         return;
                     }
 
-                    qrdetector_status.textContent =  `The QR code data ${uriValue} does not start with "otpauth://".`;
+                    qrdetector_status.textContent =  `The QR code data ${uri.value} does not start with "otpauth://".`;
                     qrdetector_status.className = 'alert alert-warning';
                 } catch (e) {
                     console.error(e);
