@@ -615,7 +615,7 @@
                         return;
                     }
 
-                    qrdetector_status.textContent = 'The QR code data does not start with "otpauth://" . ' + uri.value;
+                    qrdetector_status.textContent =  `The QR code data ${uriValue} does not start with "otpauth://".`;
                     qrdetector_status.className = 'alert alert-warning';
                 } catch (e) {
                     console.error(e);
