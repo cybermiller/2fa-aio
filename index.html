@@ -21,7 +21,10 @@
             integrity="sha256-U9OwIwkuBJSExOOc5vUNG43RAHR5XmbaBuEUB5KpHZo=" crossorigin="anonymous"></script>
     <style>
         body {
-            margin-bottom: 100px;
+            margin-bottom: 40px;
+        }
+        header h1{
+            font-size: 3.2em;
         }
 
         @media (min-width: 768px) {
@@ -243,9 +246,6 @@
    
     <p><input class="form-control" type="search" id="label" placeholder="Label" autocomplete="off"
               spellcheck="false"></p>
-    <p><input class="form-control" type="search" id="issuer" placeholder="Issuer &mdash; Optional" spellcheck="false"></p>
-    <p><input class="form-control d-none" type="search" id="counter" placeholder="Initial counter &mdash; Defaults to 0"
-              pattern="\d+" autocomplete="off" spellcheck="false"></p>
     <p><input class="form-control" type="text" id="uri" placeholder="otpauth://" autocomplete="off" spellcheck="false">
     </p>
     <hr>
@@ -280,7 +280,7 @@
     const container = document.getElementById("container");
     const secret = document.getElementById("secret");
     const label = document.getElementById("label");
-    const issuer = document.getElementById("issuer");
+    let issuer = '';
     const uri = document.getElementById("uri");
     const qr = document.getElementById("qr");
     const app_label = document.getElementById("app_label");
@@ -289,12 +289,7 @@
     
     function generate_uri() {
         const secretValue = secret.value.replace(/ /g, '');
-        let s = `otpauth://totp/${encodeURIComponent(label.value)}?secret=${secretValue}`;
-        
-        if (issuer.value !== "") {
-            s += `&issuer=${encodeURIComponent(issuer.value)}`;
-        }
-        return s;
+        return `otpauth://totp/${encodeURIComponent(label.value)}?secret=${secretValue}`;
     }
 
     function parse_uri() {
@@ -318,9 +313,10 @@
         }
 
         // update fields
-        label.value = decode(url.pathname.substr(7));
+        const labels = decode(url.pathname.substr(7)).split(":")
+        label.value = labels[0];
         secret.value = url.searchParams.get("secret");
-        issuer.value = decode(url.searchParams.get("issuer"));
+        issuer = labels[1];
         secret.classList.toggle("is-invalid", secret.value === "");
         label.classList.toggle("is-invalid", label.value === "Unknown");
 
@@ -355,10 +351,10 @@
         });
         qr.replaceChild(el, qr.firstElementChild);
 
-        if (label.value === "" && issuer.value === "") {
+        if (label.value === "" && issuer === "") {
             app_label.textContent = "Issuer";
         } else {
-            app_label.textContent = issuer.value === "" ? label.value : `${issuer.value} (${label.value})`;
+            app_label.textContent = issuer === "" ? label.value : `${issuer} (${label.value})`;
         }
     }
 
@@ -475,7 +471,7 @@
         }
     }
     
-    [secret, label, issuer].forEach(el => el.addEventListener("input", update_uri));
+    [secret, label].forEach(el => el.addEventListener("input", update_uri));
     uri.addEventListener("input", parse_uri);
     size.addEventListener("input", update_qr);
     window.addEventListener("resize", resize);
